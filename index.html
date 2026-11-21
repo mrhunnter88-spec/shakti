@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shakthi Fresh B2B | Wholesale Produce Portal</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
+.hyper-red{background:#e23744}
+.hyper-red-text{color:#e23744}
+.hyper-red-border{border-color:#e23744}
+.badge{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:fixed;left:0;top:0;width:100%;background:#fff;padding:20px}
+  .no-print{display:none!important}
+}
+</style>
+</head>
+
+<body class="text-slate-800">
+
+<!-- LOGIN -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border">
+    <div class="hyper-red text-white font-bold px-3 py-2 rounded-lg inline-block mb-4">
+      Shakthi<span class="font-light">Fresh</span>
+    </div>
+    <h1 class="text-2xl font-bold">B2B Portal Login</h1>
+    <p class="text-sm text-slate-500 mt-1">Wholesale produce ordering, fulfilment, invoicing and payments.</p>
+
+    <div class="mt-6 space-y-3">
+      <input id="loginEmail" placeholder="Email" class="w-full px-3 py-2 border rounded-lg text-sm">
+      <input id="loginPassword" type="password" placeholder="Password" class="w-full px-3 py-2 border rounded-lg text-sm">
+      <button onclick="login()" class="w-full hyper-red text-white py-3 rounded-lg font-semibold">Sign In</button>
+    </div>
+
+    <div class="mt-5 text-xs bg-slate-50 border rounded-lg p-3">
+      <p class="font-semibold">Demo logins</p>
+      <p>Admin: admin@shakthi.com / admin123</p>
+      <p>Client: client@hotel.com / client123</p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+<header class="bg-white border-b sticky top-0 z-40 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="hyper-red text-white font-bold px-3 py-1.5 rounded-lg">Shakthi<span class="font-light">Fresh</span></div>
+      <div id="userBadge" class="hidden md:block text-xs border-l pl-3"></div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div id="clientNav" class="hidden bg-slate-100 p-1 rounded-lg flex text-sm">
+        <button onclick="clientTab('store')" id="navStore" class="px-3 py-1.5 rounded-md bg-white shadow-sm">Store</button>
+        <button onclick="clientTab('orders')" id="navOrders" class="px-3 py-1.5 rounded-md">My Orders</button>
+        <button onclick="clientTab('invoices')" id="navInvoices" class="px-3 py-1.5 rounded-md">Invoices</button>
+      </div>
+
+      <div id="adminNav" class="hidden bg-slate-100 p-1 rounded-lg flex text-sm">
+        <button onclick="adminTab('dashboard')" id="navDashboard" class="px-3 py-1.5 rounded-md bg-white shadow-sm">Dashboard</button>
+        <button onclick="adminTab('inventory')" id="navInventory" class="px-3 py-1.5 rounded-md">Inventory</button>
+        <button onclick="adminTab('orders')" id="navOrdersA" class="px-3 py-1.5 rounded-md">Orders</button>
+        <button onclick="adminTab('purchases')" id="navPurchases" class="px-3 py-1.5 rounded-md">Purchases</button>
+        <button onclick="adminTab('clients')" id="navClients" class="px-3 py-1.5 rounded-md">Clients</button>
+        <button onclick="adminTab('reports')" id="navReports" class="px-3 py-1.5 rounded-md">Reports</button>
+      </div>
+
+      <button onclick="openCart()" id="cartBtn" class="hidden relative hyper-red text-white px-4 py-2 rounded-lg text-sm font-semibold">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="cartBadge" class="absolute -top-2 -right-2 bg-white border text-xs font-bold px-2 rounded-full">0</span>
+      </button>
+
+      <button onclick="logout()" class="px-3 py-2 border rounded-lg text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- CLIENT STORE -->
+<main id="clientStore" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <div class="bg-white p-4 rounded-xl border shadow-sm mb-6 flex flex-col md:flex-row gap-4 justify-between">
+    <input id="searchInput" oninput="renderCatalog()" placeholder="Search item or code..." class="w-full md:w-96 px-4 py-2 border rounded-lg text-sm">
+    <div class="flex flex-wrap gap-2">
+      <button onclick="setCat('ALL')" class="cat-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs" data-cat="ALL">All</button>
+      <button onclick="setCat('Daily Vegetables')" class="cat-btn bg-slate-100 px-3 py-1.5 rounded-lg text-xs" data-cat="Daily Vegetables">Daily Vegetables</button>
+      <button onclick="setCat('Leafy & Herbs')" class="cat-btn bg-slate-100 px-3 py-1.5 rounded-lg text-xs" data-cat="Leafy & Herbs">Leafy & Herbs</button>
+      <button onclick="setCat('Exotic & Salads')" class="cat-btn bg-slate-100 px-3 py-1.5 rounded-lg text-xs" data-cat="Exotic & Salads">Exotic & Salads</button>
+      <button onclick="setCat('Fruits & Staples')" class="cat-btn bg-slate-100 px-3 py-1.5 rounded-lg text-xs" data-cat="Fruits & Staples">Fruits & Staples</button>
+    </div>
+  </div>
+  <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+</main>
+
+<!-- CLIENT ORDERS -->
+<main id="clientOrders" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">My Purchase Orders</h2>
+  <div id="clientOrderList" class="space-y-4"></div>
+</main>
+
+<!-- CLIENT INVOICES -->
+<main id="clientInvoices" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">My Invoices & Payments</h2>
+  <div id="clientInvoiceList" class="space-y-4"></div>
+</main>
+
+<!-- ADMIN DASHBOARD -->
+<main id="adminDashboard" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">SKUs</p><p id="kpiSku" class="text-2xl font-bold">0</p></div>
+    <div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Orders</p><p id="kpiOrders" class="text-2xl font-bold">0</p></div>
+    <div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Sales</p><p id="kpiSales" class="text-2xl font-bold text-emerald-600">₹0</p></div>
+    <div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Outstanding</p><p id="kpiDue" class="text-2xl font-bold text-red-600">₹0</p></div>
+    <div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Low Stock</p><p id="kpiLow" class="text-2xl font-bold text-amber-600">0</p></div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="bg-white p-5 border rounded-xl">
+      <h3 class="font-bold mb-3">Recent Orders</h3>
+      <div id="recentOrders" class="space-y-2 text-sm"></div>
+    </div>
+    <div class="bg-white p-5 border rounded-xl">
+      <h3 class="font-bold mb-3">Low Stock / Expiry Alerts</h3>
+      <div id="alerts" class="space-y-2 text-sm"></div>
+    </div>
+  </div>
+</main>
+
+<!-- INVENTORY -->
+<main id="adminInventory" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <div class="flex justify-between mb-4">
+    <h2 class="text-xl font-bold">Inventory, Rates & Traceability</h2>
+    <div class="flex gap-2">
+      <button onclick="exportInventory()" class="px-3 py-2 border rounded-lg text-xs">Export CSV</button>
+      <button onclick="openSku()" class="hyper-red text-white px-4 py-2 rounded-lg text-xs font-semibold">Add SKU</button>
+    </div>
+  </div>
+  <div class="bg-white border rounded-xl overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+        <tr>
+          <th class="p-3">Code</th><th class="p-3">Item</th><th class="p-3">Category</th>
+          <th class="p-3">UOM</th><th class="p-3">Rate</th><th class="p-3">GST%</th>
+          <th class="p-3">HSN</th><th class="p-3">Stock</th><th class="p-3">Batch</th>
+          <th class="p-3">Expiry</th><th class="p-3">Reorder</th><th class="p-3"></th>
+        </tr>
+      </thead>
+      <tbody id="inventoryBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- ADMIN ORDERS -->
+<main id="adminOrders" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">Order Fulfilment</h2>
+  <div id="adminOrderList" class="space-y-4"></div>
+</main>
+
+<!-- PURCHASES -->
+<main id="adminPurchases" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">Purchases, Wastage & Traceability</h2>
+
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="bg-white p-5 border rounded-xl">
+      <h3 class="font-bold mb-3">Record Purchase</h3>
+      <select id="purchaseItem" class="w-full border rounded-lg p-2 text-sm mb-2"></select>
+      <input id="purchaseQty" type="number" placeholder="Quantity" class="w-full border rounded-lg p-2 text-sm mb-2">
+      <input id="purchaseCost" type="number" placeholder="Purchase cost per unit" class="w-full border rounded-lg p-2 text-sm mb-2">
+      <input id="purchaseBatch" placeholder="Batch / Lot number" class="w-full border rounded-lg p-2 text-sm mb-2">
+      <input id="purchaseSupplier" placeholder="Supplier / Farm" class="w-full border rounded-lg p-2 text-sm mb-2">
+      <button onclick="addPurchase()" class="hyper-red text-white px-4 py-2 rounded-lg text-sm font-semibold">Add Purchase</button>
+    </div>
+
+    <div class="bg-white p-5 border rounded-xl">
+      <h3 class="font-bold mb-3">Record Wastage</h3>
+      <select id="wasteItem" class="w-full border rounded-lg p-2 text-sm mb-2"></select>
+      <input id="wasteQty" type="number" placeholder="Wastage quantity" class="w-full border rounded-lg p-2 text-sm mb-2">
+      <select id="wasteReason" class="w-full border rounded-lg p-2 text-sm mb-2">
+        <option>Spoilage</option><option>Damage</option><option>Quality Rejection</option><option>Weight Loss</option>
+      </select>
+      <button onclick="addWastage()" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">Record Wastage</button>
+    </div>
+  </div>
+
+  <div class="bg-white border rounded-xl mt-4 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+        <tr><th class="p-3">Date</th><th class="p-3">Type</th><th class="p-3">Item</th><th class="p-3">Qty</th><th class="p-3">Batch</th><th class="p-3">Supplier / Reason</th><th class="p-3">Cost</th></tr>
+      </thead>
+      <tbody id="movementBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- CLIENTS -->
+<main id="adminClients" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">Clients, Credit & Payments</h2>
+  <div id="clientCards" class="grid md:grid-cols-2 gap-4"></div>
+</main>
+
+<!-- REPORTS -->
+<main id="adminReports" class="hidden max-w-7xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold mb-4">Business Reports</h2>
+  <div id="reportArea" class="space-y-4"></div>
+</main>
+</div>
+
+<!-- CART -->
+<div id="cartDrawer" class="fixed inset-0 bg-slate-900/50 z-50 hidden justify-end">
+  <div class="bg-white w-full max-w-md h-full flex flex-col">
+    <div class="p-5 border-b flex justify-between">
+      <h3 class="font-bold text-lg">Purchase Order Cart</h3>
+      <button onclick="closeCart()" class="text-xl">&times;</button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+    <div class="p-5 border-t bg-slate-50 space-y-3">
+      <input id="deliveryDate" type="date" class="w-full border rounded-lg p-2 text-sm">
+      <input id="deliveryAddress" placeholder="Delivery address" class="w-full border rounded-lg p-2 text-sm">
+      <input id="clientGstin" placeholder="Client GSTIN" class="w-full border rounded-lg p-2 text-sm">
+      <div class="flex justify-between text-sm"><span>Total Items</span><span id="cartQty">0</span></div>
+      <div class="flex justify-between text-lg font-bold"><span>Estimated Total</span><span id="cartTotal">₹0</span></div>
+      <button onclick="placeOrder()" class="w-full hyper-red text-white py-3 rounded-xl font-semibold">Submit Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE -->
+<div id="invoiceModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+  <div class="bg-white rounded-xl w-full max-w-3xl">
+    <div class="p-4 border-b flex justify-between no-print">
+      <h3 class="font-bold">Invoice Preview</h3>
+      <div class="flex gap-2">
+        <button onclick="window.print()" class="px-3 py-2 bg-slate-900 text-white rounded-lg text-xs">Print / PDF</button>
+        <button onclick="closeInvoice()" class="text-xl">&times;</button>
+      </div>
+    </div>
+
+    <div id="printArea" class="p-6">
+      <div class="flex justify-between border-b pb-4">
+        <div>
+          <h1 class="text-xl font-bold">Shakthi Fruits and Vegetables</h1>
+          <p class="text-xs text-slate-500">Wholesale Fresh Produce & Culinary Supplies</p>
+          <p class="text-xs">Vendor GSTIN: 29ABCDE1234F1Z5</p>
+        </div>
+        <div class="text-right">
+          <h2 class="font-bold">Tax Invoice</h2>
+          <p id="invNo" class="font-semibold"></p>
+          <p id="invDate" class="text-xs"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 py-4 text-sm">
+        <div>
+          <p class="text-xs uppercase text-slate-500 font-semibold">Billed To</p>
+          <p id="invClient" class="font-semibold"></p>
+          <p id="invAddress"></p>
+          <p class="text-xs">GSTIN: <span id="invGstin"></span></p>
+        </div>
+        <div class="text-right">
+          <p>PO: <span id="invPo" class="font-semibold"></span></p>
+          <p>Delivery: <span id="invDelivery"></span></p>
+          <p>Status: <span id="invStatus"></span></p>
+        </div>
+      </div>
+
+      <table class="w-full text-sm border">
+        <thead class="bg-slate-50 text-xs uppercase">
+          <tr><th class="p-2">#</th><th class="p-2">Item</th><th class="p-2">HSN</th><th class="p-2">Qty</th><th class="p-2">Rate</th><th class="p-2">Taxable</th><th class="p-2">GST</th><th class="p-2 text-right">Total</th></tr>
+        </thead>
+        <tbody id="invoiceRows"></tbody>
+      </table>
+
+      <div class="mt-4 text-sm space-y-1">
+        <div class="flex justify-between"><span>Taxable Value</span><span id="invTaxable"></span></div>
+        <div class="flex justify-between"><span>Total GST</span><span id="invGst"></span></div>
+        <div class="flex justify-between border-t pt-2 text-lg font-bold"><span>Grand Total</span><span id="invGrand"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SKU -->
+<div id="skuModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-md p-6">
+    <h3 class="font-bold text-lg mb-4">Add Contract Item</h3>
+    <div class="space-y-2">
+      <input id="newCode" placeholder="Item code" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newName" placeholder="Item name" class="w-full border rounded-lg p-2 text-sm">
+      <select id="newCategory" class="w-full border rounded-lg p-2 text-sm">
+        <option>Daily Vegetables</option><option>Leafy & Herbs</option>
+        <option>Exotic & Salads</option><option>Fruits & Staples</option>
+      </select>
+      <select id="newUom" class="w-full border rounded-lg p-2 text-sm"><option>KG</option><option>NOS</option></select>
+      <input id="newRate" type="number" placeholder="Rate" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newGst" type="number" placeholder="GST %" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newHsn" placeholder="HSN" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newStock" type="number" placeholder="Stock" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newBatch" placeholder="Batch / Lot" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newExpiry" type="date" class="w-full border rounded-lg p-2 text-sm">
+      <input id="newReorder" type="number" placeholder="Reorder level" class="w-full border rounded-lg p-2 text-sm">
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button onclick="closeSku()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button>
+      <button onclick="saveSku()" class="hyper-red text-white px-4 py-2 rounded-lg text-sm font-semibold">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-lg text-sm hidden z-50"></div>
+
+<script>
+const seedItems=[
+{code:'100000121',name:'Tomato Big',category:'Daily Vegetables',uom:'KG',rate:23,gst:0,hsn:'0702',stock:120,batch:'TOM-001',expiry:'2026-11-25',reorder:20},
+{code:'100000106',name:'Potato Big',category:'Daily Vegetables',uom:'KG',rate:27,gst:0,hsn:'0701',stock:200,batch:'POT-001',expiry:'2026-12-10',reorder:30},
+{code:'100000103',name:'Onion Big',category:'Daily Vegetables',uom:'KG',rate:50,gst:0,hsn:'0703',stock:80,batch:'ONI-001',expiry:'2026-12-20',reorder:20},
+{code:'100000116',name:'Spinach',category:'Leafy & Herbs',uom:'KG',rate:50,gst:0,hsn:'0708',stock:25,batch:'SPN-001',expiry:'2026-11-23',reorder:10},
+{code:'100000041',name:'Celery',category:'Exotic & Salads',uom:'KG',rate:110,gst:0,hsn:'0709',stock:12,batch:'CEL-001',expiry:'2026-11-24',reorder:5},
+{code:'100000124',name:'Lemon',category:'Fruits & Staples',uom:'KG',rate:120,gst:0,hsn:'0810',stock:30,batch:'LEM-001',expiry:'2026-12-01',reorder:10}
+];
+
+const seedClients=[
+{id:'C001',name:'Central Kitchen - Outlet 01',email:'client@hotel.com',password:'client123',address:'Bengaluru, Karnataka',gstin:'',creditLimit:100000,paymentTerms:'Net 15',outstanding:0}
+];
+
+let user=null,items=JSON.parse(localStorage.getItem('sf_items'))||seedItems,
+clients=JSON.parse(localStorage.getItem('sf_clients'))||seedClients,
+orders=JSON.parse(localStorage.getItem('sf_orders'))||[],
+movements=JSON.parse(localStorage.getItem('sf_moves'))||[],
+notifications=JSON.parse(localStorage.getItem('sf_notes'))||[],
+cart={},category='ALL';
+
+function save(){
+localStorage.setItem('sf_items',JSON.stringify(items));
+localStorage.setItem('sf_clients',JSON.stringify(clients));
+localStorage.setItem('sf_orders',JSON.stringify(orders));
+localStorage.setItem('sf_moves',JSON.stringify(movements));
+localStorage.setItem('sf_notes',JSON.stringify(notifications));
+}
+
+function notify(msg){
+notifications.unshift({date:new Date().toLocaleString(),msg});
+save();toast(msg);
+}
+
+function toast(msg){
+const t=document.getElementById('toast');
+t.innerText=msg;t.classList.remove('hidden');
+setTimeout(()=>t.classList.add('hidden'),3500);
+}
+
+function login(){
+const email=loginEmail.value.trim().toLowerCase(),pass=loginPassword.value;
+
+if(email==='admin@shakthi.com'&&pass==='admin123'){
+user={role:'admin',name:'Shakthi Admin'};
+}else{
+const c=clients.find(x=>x.email===email&&x.password===pass);
+if(!c)return alert('Invalid credentials');
+user={role:'client',client:c};
+}
+
+loginScreen.classList.add('hidden');
+app.classList.remove('hidden');
+userBadge.innerHTML=`<div class="font-semibold">${user.name}</div><div>${user.role.toUpperCase()}</div>`;
+
+if(user.role==='admin'){adminNav.classList.remove('hidden');adminTab('dashboard');}
+else{clientNav.classList.remove('hidden');cartBtn.classList.remove('hidden');clientTab('store');}
+}
+
+function logout(){location.reload()}
+
+function clientTab(t){
+['store','orders','invoices'].forEach(x=>{
+document.getElementById('client'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('hidden',x!==t);
+});
+['Store','Orders','Invoices'].forEach(x=>{
+document.getElementById('nav'+x).className=x.toLowerCase()===t?'px-3 py-1.5 rounded-md bg-white shadow-sm':'px-3 py-1.5 rounded-md';
+});
+if(t==='store')renderCatalog();
+if(t==='orders')renderClientOrders();
+if(t==='invoices')renderClientInvoices();
+}
+
+function adminTab(t){
+['dashboard','inventory','orders','purchases','clients','reports'].forEach(x=>{
+document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('hidden',x!==t);
+});
+['Dashboard','Inventory','Orders','Purchases','Clients','Reports'].forEach(x=>{
+document.getElementById('nav'+x).className=x.toLowerCase()===t?'px-3 py-1.5 rounded-md bg-white shadow-sm':'px-3 py-1.5 rounded-md';
+});
+if(t==='dashboard')renderDashboard();
+if(t==='inventory')renderInventory();
+if(t==='orders')renderAdminOrders();
+if(t==='purchases')renderPurchases();
+if(t==='clients')renderClients();
+if(t==='reports')renderReports();
+}
+
+function setCat(c){
+category=c;
+document.querySelectorAll('.cat-btn').forEach(b=>{
+b.className=b.dataset.cat===c?'cat-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs':'cat-btn bg-slate-100 px-3 py-1.5 rounded-lg text-xs';
+});
+renderCatalog();
+}
+
+function renderCatalog(){
+const s=searchInput.value.toLowerCase();
+productGrid.innerHTML=items.filter(i=>
+(category==='ALL'||i.category===category)&&(i.name.toLowerCase().includes(s)||i.code.includes(s))
+).map(i=>{
+const q=cart[i.code]||0,out=i.stock<=0;
+return `
+<div class="bg-white border rounded-xl p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between text-[11px] mb-2">
+<span class="font-mono bg-slate-100 px-2 rounded">#${i.code}</span>
+<span class="bg-emerald-50 text-emerald-700 px-2 rounded">${i.category}</span>
+</div>
+<h3 class="font-bold">${i.name}</h3>
+<p class="text-xs text-slate-500">Stock: ${i.stock} ${i.uom} • Batch: ${i.batch}</p>
+<p class="text-lg font-bold mt-2">₹${i.rate}/${i.uom}</p>
+</div>
+<div class="mt-3">
+${out?'<button disabled class="w-full bg-slate-200 text-slate-500 py-2 rounded-lg text-xs">Out of Stock</button>':
+q===0?`<button onclick="addCart('${i.code}')" class="w-full border hyper-red-border hyper-red-text py-2 rounded-lg text-xs font-semibold">Add +</button>`:
+`<div class="flex hyper-red text-white rounded-lg overflow-hidden">
+<button onclick="qty('${i.code}',-1)" class="px-3 py-2">-</button>
+<span class="px-3 text-xs font-bold">${q}</span>
+<button onclick="qty('${i.code}',1)" class="px-3 py-2">+</button></div>`}
+</div></div>`;
+}).join('');
+}
+
+function addCart(c){
+const i=items.find(x=>x.code===c);
+if(i.stock<=(cart[c]||0))return toast('Insufficient stock');
+cart[c]=(cart[c]||0)+1;
+renderCatalog();cartBadge.innerText=Object.keys(cart).length;
+}
+
+function qty(c,d){
+cart[c]=(cart[c]||0)+d;
+if(cart[c]<=0)delete cart[c];
+renderCatalog();cartBadge.innerText=Object.keys(cart).length;
+}
+
+function openCart(){
+cartDrawer.classList.remove('hidden');cartDrawer.classList.add('flex');renderCart();
+}
+
+function closeCart(){
+cartDrawer.classList.add('hidden');cartDrawer.classList.remove('flex');
+}
+
+function renderCart(){
+const e=Object.entries(cart);let total=0,q=0;
+cartItems.innerHTML=e.length===0?'<p class="text-center text-slate-400 py-10">Cart is empty</p>':
+e.map(([c,n])=>{
+const i=items.find(x=>x.code===c),line=i.rate*n;
+total+=line;q+=n;
+return `<div class="border p-3 rounded-lg flex justify-between">
+<div><p class="font-semibold text-sm">${i.name}</p><p class="text-xs">₹${i.rate}/${i.uom}</p></div>
+<div class="flex items-center gap-2">
+<button onclick="qty('${c}',-1)" class="border px-2">-</button>
+<span class="font-semibold">${n}</span>
+<button onclick="qty('${c}',1)" class="border px-2">+</button>
+<span class="w-16 text-right font-bold">₹${line}</span></div></div>`;
+}).join('');
+cartQty.innerText=q;cartTotal.innerText='₹'+total.toFixed(2);
+}
+
+function placeOrder(){
+const e=Object.entries(cart);
+if(!e.length)return toast('Cart is empty');
+
+const c=user.client;
+const delivery=document.getElementById('deliveryDate').value;
+const address=document.getElementById('deliveryAddress').value||c.address;
+const gstin=document.getElementById('clientGstin').value||c.gstin;
+
+let taxable=0,gst=0;
+const orderItems=e.map(([code,n])=>{
+const i=items.find(x=>x.code===code);
+const line=i.rate*n,tax=line*i.gst/100;
+taxable+=line;gst+=tax;
+i.stock=Math.max(0,i.stock-n);
+return{code:i.code,name:i.name,uom:i.uom,rate:i.rate,qty:n,gst:i.gst,hsn:i.hsn,batch:i.batch};
+});
+
+const grand=taxable+gst,num=Math.floor(100000+Math.random()*900000);
+
+const order={
+id:'PO-'+num,invoice:'INV-'+num,date:new Date().toLocaleString(),
+clientId:c.id,clientName:c.name,address,gstin,deliveryDate:delivery,
+status:'Pending',taxable,gst,total:grand,items:orderItems,
+paymentStatus:'Unpaid',deliveredQty:{},creditNote:0
+};
+
+c.outstanding+=grand;
+orders.unshift(order);cart={};
+save();renderCatalog();cartBadge.innerText=0;closeCart();
+notify(`Order ${order.id} submitted by ${c.name}`);
+openInvoice(0);
+}
+
+function renderClientOrders(){
+const my=orders.filter(o=>o.clientId===user.client.id);
+clientOrderList.innerHTML=my.length===0?'<p class="text-slate-500">No orders yet.</p>':
+my.map(o=>{
+const i=orders.indexOf(o);
+return `<div class="bg-white border rounded-xl p-5">
+<div class="flex justify-between">
+<div><p class="font-bold">${o.id}</p>
+<p class="text-xs text-slate-500">${o.date} • Delivery: ${o.deliveryDate||'--'}</p>
+<span class="badge bg-blue-100 text-blue-700">${o.status}</span></div>
+<div class="text-right"><p class="font-bold">₹${o.total.toFixed(2)}</p>
+<button onclick="openInvoice(${i})" class="mt-2 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs">Invoice</button>
+<button onclick="reorder(${i})" class="mt-2 ml-1 px-3 py-1.5 border rounded-lg text-xs">Reorder</button></div></div></div>`;
+}).join('');
+}
+
+function reorder(i){
+cart={};orders[i].items.forEach(x=>cart[x.code]=x.qty);
+clientTab('store');openCart();
+}
+
+function renderClientInvoices(){
+const my=orders.filter(o=>o.clientId===user.client.id);
+clientInvoiceList.innerHTML=my.length===0?'<p class="text-slate-500">No invoices yet.</p>':
+my.map(o=>`
+<div class="bg-white border rounded-xl p-5 flex justify-between">
+<div><p class="font-bold">${o.invoice}</p><p class="text-xs">${o.date}</p>
+<span class="badge ${o.paymentStatus==='Paid'?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-700'}">${o.paymentStatus}</span></div>
+<div class="text-right"><p class="font-bold">₹${o.total.toFixed(2)}</p>
+<button onclick="openInvoice(${orders.indexOf(o)})" class="mt-2 px-3 py-1.5 border rounded-lg text-xs">View</button></div></div>`).join('');
+}
+
+function renderDashboard(){
+kpiSku.innerText=items.length;
+kpiOrders.innerText=orders.length;
+kpiSales.innerText='₹'+orders.reduce((s,o)=>s+o.total,0).toFixed(2);
+kpiDue.innerText='₹'+clients.reduce((s,c)=>s+c.outstanding,0).toFixed(2);
+kpiLow.innerText=items.filter(i=>i.stock<=i.reorder).length;
+
+recentOrders.innerHTML=orders.slice(0,5).map(o=>`
+<div class="flex justify-between border-b pb-2"><span>${o.id} • ${o.clientName}</span><span>₹${o.total.toFixed(2)}</span></div>`).join('')||'<p class="text-slate-500">No orders</p>';
+
+alerts.innerHTML=[
+...items.filter(i=>i.stock<=i.reorder).map(i=>`<div class="text-amber-700">Low stock: ${i.name} (${i.stock})</div>`),
+...items.filter(i=>i.expiry&&new Date(i.expiry)<new Date(Date.now()+3*86400000)).map(i=>`<div class="text-red-600">Near expiry: ${i.name} (${i.expiry})</div>`)
+].join('')||'<p class="text-slate-500">No alerts</p>';
+}
+
+function renderInventory(){
+inventoryBody.innerHTML=items.map((i,x)=>`
+<tr>
+<td class="p-3 font-mono text-xs">${i.code}</td>
+<td class="p-3 font-medium">${i.name}</td>
+<td class="p-3">${i.category}</td><td class="p-3">${i.uom}</td>
+<td class="p-3"><input type="number" value="${i.rate}" onchange="items[${x}].rate=+this.value;save()" class="w-20 border rounded p-1"></td>
+<td class="p-3"><input type="number" value="${i.gst}" onchange="items[${x}].gst=+this.value;save()" class="w-16 border rounded p-1"></td>
+<td class="p-3"><input value="${i.hsn}" onchange="items[${x}].hsn=this.value;save()" class="w-20 border rounded p-1"></td>
+<td class="p-3"><input type="number" value="${i.stock}" onchange="items[${x}].stock=+this.value;save()" class="w-20 border rounded p-1"></td>
+<td class="p-3"><input value="${i.batch}" onchange="items[${x}].batch=this.value;save()" class="w-24 border rounded p-1"></td>
+<td class="p-3"><input type="date" value="${i.expiry}" onchange="items[${x}].expiry=this.value;save()" class="border rounded p-1"></td>
+<td class="p-3"><input type="number" value="${i.reorder}" onchange="items[${x}].reorder=+this.value;save()" class="w-20 border rounded p-1"></td>
+<td class="p-3"><button onclick="delSku(${x})" class="text-red-600">Delete</button></td>
+</tr>`).join('');
+}
+
+function delSku(i){if(confirm('Delete item?')){items.splice(i,1);save();renderInventory()}}
+
+function openSku(){skuModal.classList.remove('hidden');skuModal.classList.add('flex')}
+function closeSku(){skuModal.classList.add('hidden');skuModal.classList.remove('flex')}
+
+function saveSku(){
+items.unshift({code:newCode.value,name:newName.value,category:newCategory.value,uom:newUom.value,
+rate:+newRate.value,gst:+newGst.value||0,hsn:newHsn.value,stock:+newStock.value||0,
+batch:newBatch.value,expiry:newExpiry.value,reorder:+newReorder.value||0});
+save();closeSku();renderInventory();notify('New SKU added');
+}
+
+function renderAdminOrders(){
+adminOrderList.innerHTML=orders.length===0?'<p class="text-slate-500">No orders</p>':
+orders.map((o,i)=>`
+<div class="bg-white border rounded-xl p-5">
+<div class="flex justify-between">
+<div><p class="font-bold">${o.id}</p><p class="text-xs">${o.clientName} • ${o.date}</p>
+<span class="badge bg-blue-100 text-blue-700">${o.status}</span></div>
+<div class="text-right"><p class="font-bold">₹${o.total.toFixed(2)}</p>
+<select onchange="orders[${i}].status=this.value;save();notify('Order ${o.id} marked '+this.value);renderAdminOrders()" class="mt-2 border rounded p-1 text-xs">
+${['Pending','Approved','Packed','Dispatched','Delivered','Cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
+</select>
+<button onclick="openInvoice(${i})" class="mt-2 ml-2 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs">Invoice</button>
+<button onclick="partialDelivery(${i})" class="mt-2 ml-1 px-3 py-1.5 border rounded-lg text-xs">Partial Delivery</button>
+<button onclick="creditNote(${i})" class="mt-2 ml-1 px-3 py-1.5 border rounded-lg text-xs">Credit Note</button>
+</div></div></div>`).join('');
+}
+
+function partialDelivery(i){
+const o=orders[i];
+const qty=+prompt('Enter delivered quantity for '+o.items[0].name);
+if(!qty||qty<=0)return;
+o.items[0].deliveredQty=qty;
+o.status='Partially Delivered';
+save();renderAdminOrders();notify(`Partial delivery recorded for ${o.id}`);
+}
+
+function creditNote(i){
+const amount=+prompt('Enter credit note amount');
+if(!amount||amount<=0)return;
+orders[i].creditNote=(orders[i].creditNote||0)+amount;
+const c=clients.find(x=>x.id===orders[i].clientId);
+c.outstanding=Math.max(0,c.outstanding-amount);
+save();renderAdminOrders();notify(`Credit note ₹${amount} issued for ${orders[i].id}`);
+}
+
+function renderPurchases(){
+purchaseItem.innerHTML=items.map(i=>`<option value="${i.code}">${i.name}</option>`).join('');
+wasteItem.innerHTML=items.map(i=>`<option value="${i.code}">${i.name}</option>`).join('');
+
+movementBody.innerHTML=movements.length===0?'<tr><td colspan="7" class="p-4 text-slate-500">No movements</td></tr>':
+movements.map(m=>`
+<tr class="border-t"><td class="p-3">${m.date}</td><td class="p-3">${m.type}</td>
+<td class="p-3">${m.item}</td><td class="p-3">${m.qty}</td><td class="p-3">${m.batch}</td>
+<td class="p-3">${m.info}</td><td class="p-3">₹${(m.cost||0).toFixed(2)}</td></tr>`).join('');
+}
+
+function addPurchase(){
+const item=items.find(i=>i.code===purchaseItem.value);
+const q=+purchaseQty.value,cost=+purchaseCost.value;
+if(!q||!cost)return toast('Enter quantity and cost');
+
+item.stock+=q;item.batch=purchaseBatch.value||item.batch;
+movements.unshift({date:new Date().toLocaleString(),type:'Purchase',item:item.name,qty:q,batch:item.batch,info:purchaseSupplier.value,cost:cost*q});
+save();renderPurchases();notify(`Purchase added: ${item.name}`);
+}
+
+function addWastage(){
+const item=items.find(i=>i.code===wasteItem.value);
+const q=+wasteQty.value;
+if(!q||q<=0)return toast('Enter wastage quantity');
+
+item.stock=Math.max(0,item.stock-q);
+movements.unshift({date:new Date().toLocaleString(),type:'Wastage',item:item.name,qty:q,batch:item.batch,info:wasteReason.value,cost:0});
+save();renderPurchases();notify(`Wastage recorded: ${item.name}`);
+}
+
+function renderClients(){
+clientCards.innerHTML=clients.map((c,i)=>`
+<div class="bg-white border rounded-xl p-5">
+<p class="font-bold">${c.name}</p>
+<p class="text-xs text-slate-500">${c.email}</p>
+<p class="text-xs mt-2">Credit Limit: ₹${c.creditLimit}</p>
+<p class="text-xs">Outstanding: ₹${c.outstanding.toFixed(2)}</p>
+<p class="text-xs">Terms: ${c.paymentTerms}</p>
+<button onclick="payment(${i})" class="mt-3 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs">Record Payment</button>
+</div>`).join('');
+}
+
+function payment(i){
+const amt=+prompt('Enter payment received');
+if(!amt||amt<=0)return;
+clients[i].outstanding=Math.max(0,clients[i].outstanding-amt);
+save();renderClients();notify(`Payment ₹${amt} recorded for ${clients[i].name}`);
+}
+
+function renderReports(){
+const sales=orders.reduce((s,o)=>s+o.total,0);
+const gst=orders.reduce((s,o)=>s+o.gst,0);
+const due=clients.reduce((s,c)=>s+c.outstanding,0);
+const waste=movements.filter(m=>m.type==='Wastage').reduce((s,m)=>s+m.qty,0);
+
+reportArea.innerHTML=`
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Total Sales</p><p class="text-xl font-bold">₹${sales.toFixed(2)}</p></div>
+<div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Total GST</p><p class="text-xl font-bold">₹${gst.toFixed(2)}</p></div>
+<div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Receivables</p><p class="text-xl font-bold text-red-600">₹${due.toFixed(2)}</p></div>
+<div class="bg-white p-5 border rounded-xl"><p class="text-xs text-slate-500">Wastage Qty</p><p class="text-xl font-bold">${waste}</p></div>
+</div>`;
+}
+
+function openInvoice(i){
+const o=orders[i];
+invNo.innerText=o.invoice;invDate.innerText='Date: '+o.date;
+invClient.innerText=o.clientName;invAddress.innerText=o.address;
+invGstin.innerText=o.gstin||'--';invPo.innerText=o.id;
+invDelivery.innerText=o.deliveryDate||'--';invStatus.innerText=o.status;
+
+invoiceRows.innerHTML=o.items.map((x,n)=>`
+<tr class="border-t"><td class="p-2">${n+1}</td><td class="p-2">${x.name}</td>
+<td class="p-2">${x.hsn}</td><td class="p-2">${x.qty}</td><td class="p-2">₹${x.rate}</td>
+<td class="p-2">₹${(x.rate*x.qty).toFixed(2)}</td>
+<td class="p-2">₹${(x.rate*x.qty*x.gst/100).toFixed(2)}</td>
+<td class="p-2 text-right">₹${(x.rate*x.qty*(1+x.gst/100)).toFixed(2)}</td></tr>`).join('');
+
+invTaxable.innerText='₹'+o.taxable.toFixed(2);
+invGst.innerText='₹'+o.gst.toFixed(2);
+invGrand.innerText='₹'+o.total.toFixed(2);
+
+invoiceModal.classList.remove('hidden');invoiceModal.classList.add('flex');
+}
+
+function closeInvoice(){
+invoiceModal.classList.add('hidden');invoiceModal.classList.remove('flex');
+}
+
+function exportInventory(){
+const rows=[['Code','Item','Category','UOM','Rate','GST','HSN','Stock','Batch','Expiry','Reorder']];
+items.forEach(i=>rows.push([i.code,i.name,i.category,i.uom,i.rate,i.gst,i.hsn,i.stock,i.batch,i.expiry,i.reorder]));
+const csv=rows.map(r=>r.join(',')).join('\n');
+const a=document.createElement('a');
+a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+a.download='shakthi_inventory.csv';a.click();
+}
+</script>
+</body>
+</html>
